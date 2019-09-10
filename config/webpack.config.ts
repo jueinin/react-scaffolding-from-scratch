@@ -3,7 +3,14 @@ import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
-
+import get = Reflect.get;
+function getEnv() {
+    let obj:any = {};
+    Object.keys(process.env).forEach(value => {
+        obj[`process.env.${value}`] = JSON.stringify(process.env[value]);
+    })
+    return obj;
+}
 let config: webpack.Configuration = {
     entry: ['babel-polyfill',path.resolve(__dirname,'../src/index.tsx')],
     output: {
@@ -25,8 +32,9 @@ let config: webpack.Configuration = {
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: [path.resolve(__dirname, '../dist')]
         }),
-        new webpack.HotModuleReplacementPlugin({
-
+        new webpack.HotModuleReplacementPlugin({}),
+        new webpack.DefinePlugin({
+            ...getEnv() // 插入环境变量
         })
     ],
     module: {
